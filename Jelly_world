@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The World of Jelly - MVP Demo</title>
+    <style>
+        :root {
+            --jelly-purple: #9d50bb;
+            --jelly-blue: #00d4ff;
+            --jelly-pink: #ff00cc;
+            --bg-light: #f4f7f6;
+        }
+        * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background: #1a1a1a; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        
+        /* Estrutura do Celular */
+        .device { width: 360px; height: 740px; background: var(--bg-light); border: 12px solid #333; border-radius: 45px; position: relative; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 25px 50px rgba(0,0,0,0.5); }
+        
+        /* Cabeçalho */
+        .app-header { background: linear-gradient(135deg, var(--jelly-purple), var(--jelly-blue)); color: white; padding: 30px 20px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .app-header h1 { margin: 0; font-size: 1.2rem; text-transform: uppercase; letter-spacing: 1px; }
+
+        /* Área de Conteúdo */
+        .main-content { flex: 1; overflow-y: auto; padding: 20px; padding-bottom: 90px; }
+        .screen { display: none; animation: fadeIn 0.4s ease; }
+        .screen.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Cards */
+        .card { background: white; border-radius: 25px; padding: 20px; margin-bottom: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.05); border: 1px solid #eee; text-align: center; }
+        .balance-value { font-size: 2.2rem; font-weight: 800; color: #333; margin: 10px 0; }
+        
+        /* Botões */
+        .btn { background: linear-gradient(to right, var(--jelly-purple), var(--jelly-pink)); color: white; border: none; padding: 15px; width: 100%; border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.3s; font-size: 1rem; }
+        .btn:active { transform: scale(0.96); }
+        .btn:disabled { background: #ccc; cursor: not-allowed; }
+
+        /* Cronômetro Modo Foco */
+        #timer { font-size: 3.5rem; font-weight: bold; color: var(--jelly-purple); margin: 15px 0; font-variant-numeric: tabular-nums; }
+
+        /* Grid Arcade */
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .grid-item { background: white; padding: 20px; border-radius: 20px; text-align: center; cursor: pointer; border-bottom: 4px solid #eee; transition: 0.2s; }
+        .grid-item:active { transform: translateY(2px); border-bottom-width: 2px; }
+        .grid-item span { font-size: 2.5rem; display: block; margin-bottom: 10px; }
+
+        /* Navegação */
+        .bottom-nav { position: absolute; bottom: 0; width: 100%; background: white; display: flex; justify-content: space-around; padding: 15px 0; border-top: 1px solid #eee; }
+        .nav-link { background: none; border: none; color: #bbb; cursor: pointer; font-size: 0.75rem; transition: 0.3s; }
+        .nav-link.active { color: var(--jelly-purple); font-weight: bold; }
+        .nav-link i { font-size: 1.4rem; display: block; margin-bottom: 4px; }
+    </style>
+</head>
+<body>
+
+<div class="device">
+    <div class="app-header"><h1 id="header-title">The World of Jelly</h1></div>
+    
+    <div class="main-content">
+        <div id="home" class="screen active">
+            <div class="card">
+                <small style="color: #999; font-weight: bold; letter-spacing: 1px;">CARTEIRA JELLY</small>
+                <div class="balance-value">R$ <span id="saldo-text">12.50</span></div>
+                <div style="color: #4caf50; font-size: 0.85rem; font-weight: bold;">✔ Saldo Verificado</div>
+            </div>
+
+            <div class="card" style="border-top: 4px solid var(--jelly-purple);">
+                <h3>Modo Foco</h3>
+                <p style="color: #666; font-size: 0.9rem;">Ganhe <b>R$ 1.50</b> ao ficar 1 minuto offline</p>
+                <div id="timer">01:00</div>
+                <button class="btn" id="btn-foco" onclick="startFoco()">Iniciar Desconexão</button>
+            </div>
+        </div>
+
+        <div id="arcade" class="screen">
+            <h3 style="margin-bottom: 15px; color: #444;">Jelly Arcade</h3>
+            <div class="grid">
+                <div class="grid-item" onclick="earn(0.15, 'Tetris')">
+                    <span>🎮</span>
+                    <b>Tetris</b><br><small style="color: #888;">+ R$ 0.15</small>
+                </div>
+                <div class="grid-item" onclick="earn(0.20, 'Jelly Dash')">
+                    <span>🏃</span>
+                    <b>Dash</b><br><small style="color: #888;">+ R$ 0.20</small>
+                </div>
+                <div class="grid-item" onclick="earn(0.10, 'Jelly TV')">
+                    <span>📺</span>
+                    <b>Jelly TV</b><br><small style="color: #888;">+ R$ 0.10</small>
+                </div>
+                <div class="grid-item" onclick="earn(0.05, 'Check-in')">
+                    <span>🎁</span>
+                    <b>Diário</b><br><small style="color: #888;">+ R$ 0.05</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <nav class="bottom-nav">
+        <button class="nav-link active" onclick="show('home', 'The World of Jelly', this)"><i>🏠</i>Home</button>
+        <button class="nav-link" onclick="show('arcade', 'Jelly Arcade', this)"><i>🕹️</i>Arcade</button>
+    </nav>
+</div>
+
+<script>
+    let saldo = 12.50;
+    let timerRunning = false;
+
+    // Função de Ganho
+    function earn(val, source) {
+        saldo += val;
+        document.getElementById('saldo-text').innerText = saldo.toFixed(2);
+        // Feedback visual simples
+        const toast = document.createElement("div");
+        toast.style = "position:absolute; bottom:80px; left:50%; transform:translateX(-50%); background:rgba(0,0,0,0.7); color:white; padding:10px 20px; border-radius:20px; font-size:0.8rem; z-index:100;";
+        toast.innerText = `+ R$ ${val.toFixed(2)} por ${source}`;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 2000);
+    }
+
+    // Troca de Telas
+    function show(id, title, btn) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        document.getElementById('header-title').innerText = title;
+        document.querySelectorAll('.nav-link').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+    }
+
+    // Cronômetro do Modo Foco
+    function startFoco() {
+        if(timerRunning) return;
+        timerRunning = true;
+        let time = 60;
+        const btn = document.getElementById('btn-foco');
+        btn.disabled = true;
+        btn.innerText = "Foco Ativo...";
+
+        let countdown = setInterval(() => {
+            time--;
+            let m = Math.floor(time / 60);
+            let s = time % 60;
+            document.getElementById('timer').innerText = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+
+            if(time <= 0) {
+                clearInterval(countdown);
+                timerRunning = false;
+                earn(1.50, 'Modo Foco');
+                document.getElementById('timer').innerText = "01:00";
+                btn.disabled = false;
+                btn.innerText = "Iniciar Desconexão";
+                alert("Missão Cumprida! R$ 1.50 adicionados.");
+            }
+        }, 1000);
+    }
+</script>
+
+</body>
+</html>
