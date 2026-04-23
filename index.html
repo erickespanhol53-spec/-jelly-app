@@ -3,157 +3,259 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The World of Jelly - MVP Demo</title>
+    <title>The World of Jelly - MVP</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --jelly-purple: #9d50bb;
-            --jelly-blue: #00d4ff;
-            --jelly-pink: #ff00cc;
-            --bg-light: #f4f7f6;
+            --primary: #ff0080;
+            --secondary: #7000ff;
+            --bg: #0a0a0c;
+            --card-bg: #16161d;
+            --text: #ffffff;
         }
-        * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background: #1a1a1a; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        
-        /* Estrutura do Celular */
-        .device { width: 360px; height: 740px; background: var(--bg-light); border: 12px solid #333; border-radius: 45px; position: relative; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 25px 50px rgba(0,0,0,0.5); }
-        
-        /* Cabeçalho */
-        .app-header { background: linear-gradient(135deg, var(--jelly-purple), var(--jelly-blue)); color: white; padding: 30px 20px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        .app-header h1 { margin: 0; font-size: 1.2rem; text-transform: uppercase; letter-spacing: 1px; }
 
-        /* Área de Conteúdo */
-        .main-content { flex: 1; overflow-y: auto; padding: 20px; padding-bottom: 90px; }
-        .screen { display: none; animation: fadeIn 0.4s ease; }
-        .screen.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        * { margin: 0; padding: 0; box-box: border-box; font-family: 'Poppins', sans-serif; }
 
-        /* Cards */
-        .card { background: white; border-radius: 25px; padding: 20px; margin-bottom: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.05); border: 1px solid #eee; text-align: center; }
-        .balance-value { font-size: 2.2rem; font-weight: 800; color: #333; margin: 10px 0; }
-        
-        /* Botões */
-        .btn { background: linear-gradient(to right, var(--jelly-purple), var(--jelly-pink)); color: white; border: none; padding: 15px; width: 100%; border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.3s; font-size: 1rem; }
-        .btn:active { transform: scale(0.96); }
-        .btn:disabled { background: #ccc; cursor: not-allowed; }
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            overflow-x: hidden;
+        }
 
-        /* Cronômetro Modo Foco */
-        #timer { font-size: 3.5rem; font-weight: bold; color: var(--jelly-purple); margin: 15px 0; font-variant-numeric: tabular-nums; }
+        /* Layout Responsivo */
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
 
-        /* Grid Arcade */
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .grid-item { background: white; padding: 20px; border-radius: 20px; text-align: center; cursor: pointer; border-bottom: 4px solid #eee; transition: 0.2s; }
-        .grid-item:active { transform: translateY(2px); border-bottom-width: 2px; }
-        .grid-item span { font-size: 2.5rem; display: block; margin-bottom: 10px; }
+        @media (min-width: 1024px) {
+            .app-container {
+                flex-direction: row;
+            }
+            .sidebar {
+                display: flex !important;
+                width: 280px;
+                background: var(--card-bg);
+                flex-direction: column;
+                padding: 20px;
+                border-right: 1px solid #333;
+            }
+            .tab-bar { display: none !important; }
+            .main-content { flex: 1; padding: 40px; }
+        }
 
-        /* Navegação */
-        .bottom-nav { position: absolute; bottom: 0; width: 100%; background: white; display: flex; justify-content: space-around; padding: 15px 0; border-top: 1px solid #eee; }
-        .nav-link { background: none; border: none; color: #bbb; cursor: pointer; font-size: 0.75rem; transition: 0.3s; }
-        .nav-link.active { color: var(--jelly-purple); font-weight: bold; }
-        .nav-link i { font-size: 1.4rem; display: block; margin-bottom: 4px; }
+        /* Sidebar (Desktop) */
+        .sidebar { display: none; }
+        .sidebar h2 { color: var(--primary); margin-bottom: 30px; }
+        .nav-item {
+            padding: 15px;
+            cursor: pointer;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            transition: 0.3s;
+        }
+        .nav-item:hover { background: var(--secondary); }
+
+        /* Main Content */
+        .main-content { padding: 20px; padding-bottom: 100px; }
+
+        .header-wallet {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            padding: 25px;
+            border-radius: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        }
+
+        /* Timer Focus */
+        .focus-card {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            border: 1px solid #333;
+        }
+
+        .timer-display {
+            font-size: 3rem;
+            font-weight: 600;
+            margin: 20px 0;
+            color: var(--primary);
+        }
+
+        /* Chat Section */
+        .chat-container {
+            background: var(--card-bg);
+            border-radius: 20px;
+            height: 400px;
+            display: flex;
+            flex-direction: column;
+            margin-top: 25px;
+            border: 1px solid #333;
+        }
+        .chat-messages { flex: 1; padding: 20px; overflow-y: auto; font-size: 0.9rem; }
+        .message { margin-bottom: 15px; padding: 10px; border-radius: 10px; max-width: 80%; }
+        .bot { background: #333; align-self: flex-start; }
+        .user { background: var(--secondary); align-self: flex-end; margin-left: auto; }
+        .chat-input { display: flex; padding: 15px; border-top: 1px solid #333; }
+        .chat-input input { flex: 1; background: #000; border: none; padding: 10px; color: #fff; border-radius: 5px; }
+
+        /* Arcade Grid */
+        .arcade-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .game-card {
+            background: #222;
+            border-radius: 15px;
+            overflow: hidden;
+            text-align: center;
+            transition: 0.3s;
+        }
+        .game-card:hover { transform: translateY(-5px); }
+        .game-thumb { height: 100px; background: #444; display: flex; align-items: center; justify-content: center; }
+
+        /* Mobile Tab Bar */
+        .tab-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 70px;
+            background: var(--card-bg);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border-top: 1px solid #333;
+            z-index: 100;
+        }
+
+        .btn-action {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .hidden { display: none; }
     </style>
 </head>
 <body>
 
-<div class="device">
-    <div class="app-header"><h1 id="header-title">The World of Jelly</h1></div>
-    
-    <div class="main-content">
-        <div id="home" class="screen active">
-            <div class="card">
-                <small style="color: #999; font-weight: bold; letter-spacing: 1px;">CARTEIRA JELLY</small>
-                <div class="balance-value">R$ <span id="saldo-text">12.50</span></div>
-                <div style="color: #4caf50; font-size: 0.85rem; font-weight: bold;">✔ Saldo Verificado</div>
-            </div>
+    <div class="app-container">
+        <aside class="sidebar">
+            <h2>Jelly World</h2>
+            <div class="nav-item" onclick="showTab('home')">Home / Carteira</div>
+            <div class="nav-item" onclick="showTab('arcade')">Jelly Arcade</div>
+            <div class="nav-item" onclick="showTab('chat')">Chat da Comunidade</div>
+        </aside>
 
-            <div class="card" style="border-top: 4px solid var(--jelly-purple);">
-                <h3>Modo Foco</h3>
-                <p style="color: #666; font-size: 0.9rem;">Ganhe <b>R$ 1.50</b> ao ficar 1 minuto offline</p>
-                <div id="timer">01:00</div>
-                <button class="btn" id="btn-foco" onclick="startFoco()">Iniciar Desconexão</button>
-            </div>
-        </div>
+        <main class="main-content">
+            <section id="home">
+                <div class="header-wallet">
+                    <p style="opacity: 0.8;">Saldo Disponível</p>
+                    <h1 id="balance">R$ 12,50</h1>
+                </div>
 
-        <div id="arcade" class="screen">
-            <h3 style="margin-bottom: 15px; color: #444;">Jelly Arcade</h3>
-            <div class="grid">
-                <div class="grid-item" onclick="earn(0.15, 'Tetris')">
-                    <span>🎮</span>
-                    <b>Tetris</b><br><small style="color: #888;">+ R$ 0.15</small>
+                <div class="focus-card">
+                    <h3>Modo Foco</h3>
+                    <p>Ganhe JellyPoints ficando longe do celular</p>
+                    <div class="timer-display" id="timer">25:00</div>
+                    <button class="btn-action" id="startBtn" onclick="toggleTimer()">Iniciar Sessão</button>
                 </div>
-                <div class="grid-item" onclick="earn(0.20, 'Jelly Dash')">
-                    <span>🏃</span>
-                    <b>Dash</b><br><small style="color: #888;">+ R$ 0.20</small>
+            </section>
+
+            <section id="arcade" class="hidden">
+                <h2>Jelly Arcade</h2>
+                <div class="arcade-grid">
+                    <div class="game-card">
+                        <div class="game-thumb">🎰</div>
+                        <p style="padding: 10px;">Lucky Jelly</p>
+                    </div>
+                    <div class="game-card">
+                        <div class="game-thumb">🧩</div>
+                        <p style="padding: 10px;">Memory Game</p>
+                    </div>
+                    <div class="game-card">
+                        <div class="game-thumb">☄️</div>
+                        <p style="padding: 10px;">Space Jelly</p>
+                    </div>
                 </div>
-                <div class="grid-item" onclick="earn(0.10, 'Jelly TV')">
-                    <span>📺</span>
-                    <b>Jelly TV</b><br><small style="color: #888;">+ R$ 0.10</small>
+            </section>
+
+            <section id="chat" class="hidden">
+                <h2>Comunidade Jelly</h2>
+                <div class="chat-container">
+                    <div class="chat-messages" id="chatMessages">
+                        <div class="message bot">Bem-vindo ao chat global! Como está seu foco hoje?</div>
+                        <div class="message user">Acabei de completar 25 minutos! 🚀</div>
+                    </div>
+                    <div class="chat-input">
+                        <input type="text" placeholder="Digite uma mensagem...">
+                        <button class="btn-action" style="margin-left: 10px; padding: 5px 15px;">Enviar</button>
+                    </div>
                 </div>
-                <div class="grid-item" onclick="earn(0.05, 'Check-in')">
-                    <span>🎁</span>
-                    <b>Diário</b><br><small style="color: #888;">+ R$ 0.05</small>
-                </div>
-            </div>
-        </div>
+            </section>
+        </main>
+
+        <nav class="tab-bar">
+            <span onclick="showTab('home')">🏠</span>
+            <span onclick="showTab('arcade')">🎮</span>
+            <span onclick="showTab('chat')">💬</span>
+        </nav>
     </div>
 
-    <nav class="bottom-nav">
-        <button class="nav-link active" onclick="show('home', 'The World of Jelly', this)"><i>🏠</i>Home</button>
-        <button class="nav-link" onclick="show('arcade', 'Jelly Arcade', this)"><i>🕹️</i>Arcade</button>
-    </nav>
-</div>
+    <script>
+        // Lógica de Troca de Abas
+        function showTab(tabId) {
+            document.getElementById('home').classList.add('hidden');
+            document.getElementById('arcade').classList.add('hidden');
+            document.getElementById('chat').classList.add('hidden');
+            document.getElementById(tabId).classList.remove('hidden');
+        }
 
-<script>
-    let saldo = 12.50;
-    let timerRunning = false;
+        // Lógica do Cronômetro Simples
+        let timer;
+        let isRunning = false;
+        let timeLeft = 1500; // 25 minutos
 
-    // Função de Ganho
-    function earn(val, source) {
-        saldo += val;
-        document.getElementById('saldo-text').innerText = saldo.toFixed(2);
-        // Feedback visual simples
-        const toast = document.createElement("div");
-        toast.style = "position:absolute; bottom:80px; left:50%; transform:translateX(-50%); background:rgba(0,0,0,0.7); color:white; padding:10px 20px; border-radius:20px; font-size:0.8rem; z-index:100;";
-        toast.innerText = `+ R$ ${val.toFixed(2)} por ${source}`;
-        document.body.appendChild(toast);
-        setTimeout(() => toast.remove(), 2000);
-    }
-
-    // Troca de Telas
-    function show(id, title, btn) {
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-        document.getElementById('header-title').innerText = title;
-        document.querySelectorAll('.nav-link').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-    }
-
-    // Cronômetro do Modo Foco
-    function startFoco() {
-        if(timerRunning) return;
-        timerRunning = true;
-        let time = 60;
-        const btn = document.getElementById('btn-foco');
-        btn.disabled = true;
-        btn.innerText = "Foco Ativo...";
-
-        let countdown = setInterval(() => {
-            time--;
-            let m = Math.floor(time / 60);
-            let s = time % 60;
-            document.getElementById('timer').innerText = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-
-            if(time <= 0) {
-                clearInterval(countdown);
-                timerRunning = false;
-                earn(1.50, 'Modo Foco');
-                document.getElementById('timer').innerText = "01:00";
-                btn.disabled = false;
-                btn.innerText = "Iniciar Desconexão";
-                alert("Missão Cumprida! R$ 1.50 adicionados.");
+        function toggleTimer() {
+            const btn = document.getElementById('startBtn');
+            const display = document.getElementById('timer');
+            
+            if (!isRunning) {
+                isRunning = true;
+                btn.innerText = "Pausar";
+                timer = setInterval(() => {
+                    timeLeft--;
+                    let mins = Math.floor(timeLeft / 60);
+                    let secs = timeLeft % 60;
+                    display.innerText = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+                    
+                    if (timeLeft <= 0) {
+                        clearInterval(timer);
+                        alert("Sessão finalizada! Você ganhou R$ 0,50");
+                        updateBalance(0.50);
+                    }
+                }, 1000);
+            } else {
+                isRunning = false;
+                btn.innerText = "Retomar";
+                clearInterval(timer);
             }
-        }, 1000);
-    }
-</script>
+        }
 
+        function updateBalance(val) {
+            let current = parseFloat(document.getElementById('balance').innerText.replace('R$ ', '').replace(',', '.'));
+            let nuevo = current + val;
+            document.getElementById('balance').innerText = `R$ ${nuevo.toFixed(2).replace('.', ',')}`;
+        }
+    </script>
 </body>
 </html>
